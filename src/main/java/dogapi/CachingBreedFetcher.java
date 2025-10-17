@@ -22,24 +22,20 @@ public class CachingBreedFetcher implements BreedFetcher {
     }
 
     @Override
-    public List<String> getSubBreeds(String breed) throws BreedNotFoundException {
+    public List<String> getSubBreeds(String breed) throws BreedFetcher.BreedNotFoundException {
         String key = breed.toLowerCase();
 
-        // Return cached result if available
         if (cache.containsKey(key)) {
             return cache.get(key);
         }
 
+        callsMade++; // count every call
         try {
-            callsMade++;  // Increment before calling the underlying fetcher
             List<String> subBreeds = fetcher.getSubBreeds(breed);
-
-            // Only cache successful fetches
-            cache.put(key, subBreeds);
+            cache.put(key, subBreeds); // cache only successful fetches
             return subBreeds;
-        } catch (BreedNotFoundException e) {
-            // Do not cache failures, just rethrow
-            throw e;
+        } catch (BreedFetcher.BreedNotFoundException e) {
+            throw e; // do not cache failures
         }
     }
 
